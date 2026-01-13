@@ -120,9 +120,64 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.UsuarioScalarFieldEnum = {
+  id_usuario: 'id_usuario',
+  nombre: 'nombre',
+  apellido: 'apellido',
+  dni: 'dni',
+  correo: 'correo',
+  telefono: 'telefono',
+  clave: 'clave',
+  tipo: 'tipo',
+  createdAt: 'createdAt',
+  rolId: 'rolId'
+};
+
+exports.Prisma.InscripcionScalarFieldEnum = {
+  id_inscripcion: 'id_inscripcion',
+  id_usuario: 'id_usuario',
+  id_carrera: 'id_carrera',
+  fecha_inscripcion: 'fecha_inscripcion'
+};
+
+exports.Prisma.RolScalarFieldEnum = {
+  id_rol: 'id_rol',
+  nombre: 'nombre'
+};
+
+exports.Prisma.PermisoScalarFieldEnum = {
+  id_permiso: 'id_permiso',
+  nombre: 'nombre'
+};
+
+exports.Prisma.RolPermisoScalarFieldEnum = {
+  id: 'id',
+  rolId: 'rolId',
+  permisoId: 'permisoId'
+};
+
+exports.Prisma.SortOrder = {
+  asc: 'asc',
+  desc: 'desc'
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 
 exports.Prisma.ModelName = {
-
+  Usuario: 'Usuario',
+  Inscripcion: 'Inscripcion',
+  Rol: 'Rol',
+  Permiso: 'Permiso',
+  RolPermiso: 'RolPermiso'
 };
 
 /**

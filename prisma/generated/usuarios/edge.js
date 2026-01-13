@@ -92,9 +92,64 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.UsuarioScalarFieldEnum = {
+  id_usuario: 'id_usuario',
+  nombre: 'nombre',
+  apellido: 'apellido',
+  dni: 'dni',
+  correo: 'correo',
+  telefono: 'telefono',
+  clave: 'clave',
+  tipo: 'tipo',
+  createdAt: 'createdAt',
+  rolId: 'rolId'
+};
+
+exports.Prisma.InscripcionScalarFieldEnum = {
+  id_inscripcion: 'id_inscripcion',
+  id_usuario: 'id_usuario',
+  id_carrera: 'id_carrera',
+  fecha_inscripcion: 'fecha_inscripcion'
+};
+
+exports.Prisma.RolScalarFieldEnum = {
+  id_rol: 'id_rol',
+  nombre: 'nombre'
+};
+
+exports.Prisma.PermisoScalarFieldEnum = {
+  id_permiso: 'id_permiso',
+  nombre: 'nombre'
+};
+
+exports.Prisma.RolPermisoScalarFieldEnum = {
+  id: 'id',
+  rolId: 'rolId',
+  permisoId: 'permisoId'
+};
+
+exports.Prisma.SortOrder = {
+  asc: 'asc',
+  desc: 'desc'
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 
 exports.Prisma.ModelName = {
-
+  Usuario: 'Usuario',
+  Inscripcion: 'Inscripcion',
+  Rol: 'Rol',
+  Permiso: 'Permiso',
+  RolPermiso: 'RolPermiso'
 };
 /**
  * Create the Client
@@ -104,10 +159,10 @@ const config = {
   "clientVersion": "7.2.0",
   "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
   "activeProvider": "postgresql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../../prisma/generated/usuarios\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n"
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/usuarios\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\n/**\n * Usuario = unión de Estudiante y Profesor (para auth/roles).\n * Mantengo campos similares a tu schema original.\n */\nmodel Usuario {\n  id_usuario Int      @id @default(autoincrement())\n  nombre     String   @db.VarChar(100)\n  apellido   String   @db.VarChar(100)\n  dni        String   @db.VarChar(20)\n  correo     String   @unique @db.VarChar(100)\n  telefono   String?  @db.VarChar(20)\n  clave      String?  @db.VarChar(255) // si usas password local\n  tipo       String?  @db.VarChar(20) // 'estudiante' | 'profesor' | 'admin'\n  createdAt  DateTime @default(now())\n  rolId      Int\n  rol        Rol      @relation(\"RolUsuarios\", fields: [rolId], references: [id_rol])\n\n  // Relación 1:1 lógica con Inscripciones/Estudiante local\n  inscripciones Inscripcion[]\n\n  @@map(\"Usuario\")\n}\n\n/**\n * Inscripcion pertenece a la DB usuarios.\n * Contiene id_usuario y id_carrera (carrera está en DB carreras)\n */\nmodel Inscripcion {\n  id_inscripcion    Int      @id @default(autoincrement())\n  id_usuario        Int\n  id_carrera        Int // FK lógico hacia DB carreras\n  fecha_inscripcion DateTime @db.Date\n\n  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])\n\n  @@map(\"Inscripcion\")\n}\n\n/**\n * Roles y permisos (mismo DB de usuarios)\n */\nmodel Rol {\n  id_rol   Int       @id @default(autoincrement())\n  nombre   String\n  usuarios Usuario[] @relation(\"RolUsuarios\") // 👈 Puede o no llevar nombre\n\n  permisos RolPermiso[]\n\n  @@map(\"Rol\")\n}\n\nmodel Permiso {\n  id_permiso  Int          @id @default(autoincrement())\n  nombre      String       @db.VarChar(100)\n  rolPermisos RolPermiso[]\n\n  @@map(\"Permiso\")\n}\n\nmodel RolPermiso {\n  id        Int @id @default(autoincrement())\n  rolId     Int\n  permisoId Int\n\n  rol     Rol     @relation(fields: [rolId], references: [id_rol])\n  permiso Permiso @relation(fields: [permisoId], references: [id_permiso])\n\n  @@map(\"RolPermiso\")\n}\n"
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Usuario\":{\"fields\":[{\"name\":\"id_usuario\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"nombre\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"apellido\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"dni\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"correo\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"telefono\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"clave\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"tipo\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"rolId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"rol\",\"kind\":\"object\",\"type\":\"Rol\",\"relationName\":\"RolUsuarios\"},{\"name\":\"inscripciones\",\"kind\":\"object\",\"type\":\"Inscripcion\",\"relationName\":\"InscripcionToUsuario\"}],\"dbName\":\"Usuario\"},\"Inscripcion\":{\"fields\":[{\"name\":\"id_inscripcion\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"id_usuario\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"id_carrera\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"fecha_inscripcion\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"usuario\",\"kind\":\"object\",\"type\":\"Usuario\",\"relationName\":\"InscripcionToUsuario\"}],\"dbName\":\"Inscripcion\"},\"Rol\":{\"fields\":[{\"name\":\"id_rol\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"nombre\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"usuarios\",\"kind\":\"object\",\"type\":\"Usuario\",\"relationName\":\"RolUsuarios\"},{\"name\":\"permisos\",\"kind\":\"object\",\"type\":\"RolPermiso\",\"relationName\":\"RolToRolPermiso\"}],\"dbName\":\"Rol\"},\"Permiso\":{\"fields\":[{\"name\":\"id_permiso\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"nombre\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"rolPermisos\",\"kind\":\"object\",\"type\":\"RolPermiso\",\"relationName\":\"PermisoToRolPermiso\"}],\"dbName\":\"Permiso\"},\"RolPermiso\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"rolId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"permisoId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"rol\",\"kind\":\"object\",\"type\":\"Rol\",\"relationName\":\"RolToRolPermiso\"},{\"name\":\"permiso\",\"kind\":\"object\",\"type\":\"Permiso\",\"relationName\":\"PermisoToRolPermiso\"}],\"dbName\":\"RolPermiso\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.compilerWasm = {
   getRuntime: async () => require('./query_compiler_bg.js'),
