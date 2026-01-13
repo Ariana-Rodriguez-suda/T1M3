@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../prisma/generated/carreras"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Carrera {
+  id_carrera      Int       @id @default(autoincrement())
+  nombre_carrera  String    @db.VarChar(150)
+  duracion_anos   Int
+  
+  materias        Materia[]
+
+  @@map("Carrera")
+}
+
+model Aula {
+  id_aula      Int       @id @default(autoincrement())
+  nombre_aula  String    @db.VarChar(50)
+  capacidad    Int
+  ubicacion    String?   @db.VarChar(100)
+
+  materias     Materia[]
+
+  @@map("Aula")
+}
+
+/*
+  Materia mantiene su relación con Carrera/Aula dentro de esta DB.
+  Además tiene id_inscripcion (Int) que referencia LÓGICAMENTE a Inscripcion.id_inscripcion
+  en la DB usuarios (no es relación Prisma).
+*/
+model Materia {
+  id_materia        Int      @id @default(autoincrement())
+  nombre_materia    String   @db.VarChar(150)
+  id_carrera        Int
+  id_aula           Int
+  periodoId         Int?
+  periodo           Periodo? @relation(fields: [periodoId], references: [id_periodo])
+
+  carrera           Carrera  @relation(fields: [id_carrera], references: [id_carrera])
+  aula              Aula     @relation(fields: [id_aula], references: [id_aula])
+
+  id_inscripcion    Int?
+
+  @@map("Materia")
+}
+
+model Periodo {
+  id_periodo   Int      @id @default(autoincrement())
+  nombre       String
+  fecha_inicio DateTime
+  fecha_fin    DateTime
+
+  materias     Materia[]   // ← SOLO ESTO. Nada más.
+
+  @@map("Periodo")
+}

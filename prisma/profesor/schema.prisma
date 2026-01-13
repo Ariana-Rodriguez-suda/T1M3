@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/profesor"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Profesor {
+  id_profesor      Int      @id @default(autoincrement())
+  userId           Int?     // enlace lógico al Usuario.id_usuario (DB usuarios). SIN FK.
+
+  titulos          Titulo[]
+
+  @@map("Profesor")
+}
+
+model Titulo {
+  id_titulo      Int      @id @default(autoincrement())
+  id_profesor    Int
+  nombre_titulo  String   @db.VarChar(150)
+  institucion    String   @db.VarChar(150)
+  ano_obtencion  Int
+
+  profesor       Profesor @relation(fields: [id_profesor], references: [id_profesor])
+
+  @@map("Titulo")
+}

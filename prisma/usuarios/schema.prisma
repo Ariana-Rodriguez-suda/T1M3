@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/usuarios"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/**
+ * Usuario = unión de Estudiante y Profesor (para auth/roles).
+ * Mantengo campos similares a tu schema original.
+ */
+model Usuario {
+  id_usuario Int      @id @default(autoincrement())
+  nombre     String   @db.VarChar(100)
+  apellido   String   @db.VarChar(100)
+  dni        String   @db.VarChar(20)
+  correo     String   @unique @db.VarChar(100)
+  telefono   String?  @db.VarChar(20)
+  clave      String?  @db.VarChar(255) // si usas password local
+  tipo       String?  @db.VarChar(20) // 'estudiante' | 'profesor' | 'admin'
+  createdAt  DateTime @default(now())
+  rolId      Int
+  rol        Rol      @relation("RolUsuarios", fields: [rolId], references: [id_rol])
+
+  // Relación 1:1 lógica con Inscripciones/Estudiante local
+  inscripciones Inscripcion[]
+
+  @@map("Usuario")
+}
+
+/**
+ * Inscripcion pertenece a la DB usuarios.
+ * Contiene id_usuario y id_carrera (carrera está en DB carreras)
+ */
+model Inscripcion {
+  id_inscripcion    Int      @id @default(autoincrement())
+  id_usuario        Int
+  id_carrera        Int // FK lógico hacia DB carreras
+  fecha_inscripcion DateTime @db.Date
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@map("Inscripcion")
+}
+
+/**
+ * Roles y permisos (mismo DB de usuarios)
+ */
+model Rol {
+  id_rol   Int       @id @default(autoincrement())
+  nombre   String
+  usuarios Usuario[] @relation("RolUsuarios") // 👈 Puede o no llevar nombre
+
+  permisos RolPermiso[]
+
+  @@map("Rol")
+}
+
+model Permiso {
+  id_permiso  Int          @id @default(autoincrement())
+  nombre      String       @db.VarChar(100)
+  rolPermisos RolPermiso[]
+
+  @@map("Permiso")
+}
+
+model RolPermiso {
+  id        Int @id @default(autoincrement())
+  rolId     Int
+  permisoId Int
+
+  rol     Rol     @relation(fields: [rolId], references: [id_rol])
+  permiso Permiso @relation(fields: [permisoId], references: [id_permiso])
+
+  @@map("RolPermiso")
+}
