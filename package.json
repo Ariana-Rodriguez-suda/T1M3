@@ -23,7 +23,10 @@
     "prisma:generate:profesor": "prisma generate --schema=prisma/profesor/schema.prisma --config=prisma/profesor/prisma.config.ts",
     "prisma:migrate:usuarios": "prisma migrate dev --name init_usuarios --schema=prisma/usuarios/schema.prisma --config=prisma/usuarios/prisma.config.ts",
     "prisma:migrate:carreras": "prisma migrate dev --name init_carreras --schema=prisma/carreras/schema.prisma --config=prisma/carreras/prisma.config.ts",
-    "prisma:migrate:profesor": "prisma migrate dev --name init_profesor --schema=prisma/profesor/schema.prisma --config=prisma/profesor/prisma.config.ts"
+    "prisma:migrate:profesor": "prisma migrate dev --name init_profesor --schema=prisma/profesor/schema.prisma --config=prisma/profesor/prisma.config.ts",
+    "prisma:seed:usuarios": "ts-node prisma/seed-usuarios.ts",
+    "prisma:seed:carreras": "ts-node prisma/seed-carreras.ts",
+    "prisma:seed:profesor": "ts-node prisma/seed-profesor.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
