@@ -1,7 +1,13 @@
 import 'dotenv/config'
-import { PrismaClient } from './generated/carreras'
+import { PrismaClient } from '../generated/carreras'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
 
-const prisma = new PrismaClient()
+const connectionString = process.env.DATABASE_CARRERAS
+const pool = new Pool({ connectionString })
+const adapter = new PrismaPg(pool)
+
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
   await prisma.carrera.createMany({

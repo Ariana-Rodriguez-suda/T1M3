@@ -46,4 +46,90 @@ export class UsuarioService {
       where: { id_usuario: id },
     });
   }
+
+  async findActiveStudentsWithCareer() {
+    return this.prisma.usuario.findMany({
+      where: {
+        tipo: 'estudiante',
+      },
+      include: {
+        inscripciones: true,
+        rol: true,
+      },
+    });
+  }
+
+  async getCareerMaterias(idCarrera: number) {
+    return this.prisma.$queryRaw`
+      SELECT m.* FROM "Materia" m
+      WHERE m.id_carrera = ${idCarrera}
+    `;
+  }
+
+  async findTeachersWithMultipleSubjects() {
+    return this.prisma.usuario.findMany({
+      where: {
+        tipo: 'profesor',
+      },
+      include: {
+        rol: true,
+      },
+    });
+  }
+
+  async findStudentEnrollmentsByPeriod(idUsuario: number, idPeriodo: number) {
+    return this.prisma.inscripcion.findMany({
+      where: {
+        id_usuario: idUsuario,
+      },
+      include: {
+        usuario: true,
+      },
+    });
+  }
+
+  async findActiveStudentsByCareerAndPeriod(idCarrera: number) {
+    return this.prisma.usuario.findMany({
+      where: {
+        AND: [
+          { tipo: 'estudiante' },
+          { inscripciones: { some: { id_carrera: idCarrera } } },
+        ],
+      },
+      include: {
+        inscripciones: true,
+        rol: true,
+      },
+    });
+  }
+
+  async findActiveTeachers() {
+    return this.prisma.usuario.findMany({
+      where: {
+        AND: [
+          { tipo: 'profesor' },
+          { NOT: { tipo: 'inactivo' } },
+        ],
+      },
+      include: {
+        rol: true,
+      },
+    });
+  }
+
+  async findStudentsByCareerAndRole(idCarrera: number, roleFilter?: string) {
+    return this.prisma.usuario.findMany({
+      where: {
+        AND: [
+          { tipo: 'estudiante' },
+          { inscripciones: { some: { id_carrera: idCarrera } } },
+          roleFilter ? { rol: { nombre: roleFilter } } : {},
+        ],
+      },
+      include: {
+        inscripciones: true,
+        rol: true,
+      },
+    });
+  }
 }

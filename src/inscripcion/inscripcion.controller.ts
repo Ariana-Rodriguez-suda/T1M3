@@ -45,4 +45,31 @@ export class InscripcionController {
   remove(@Param('id') id: number) {
     return this.inscripcionService.remove(id);
   }
+
+  @Get('by-career/:id_carrera')
+  async getEnrollmentsByCarrera(
+    @Param('id_carrera', ParseIntPipe) idCarrera: number,
+  ) {
+    return this.inscripcionService.findEnrollmentsByCarrera(idCarrera);
+  }
+
+  @Get('student/:id_usuario/period/:id_periodo')
+  async getStudentEnrollmentsByPeriod(
+    @Param('id_usuario', ParseIntPipe) idUsuario: number,
+    @Param('id_periodo', ParseIntPipe) idPeriodo: number,
+  ) {
+    return this.inscripcionService.findStudentEnrollmentsByPeriod(idUsuario, idPeriodo);
+  }
+
+  @Post('enroll-transactional')
+  async enrollStudentInCourseTransactional(
+    @Body() dto: { id_usuario: number; id_materia: number },
+  ) {
+    return this.inscripcionService.enrollStudentInCourse(dto.id_usuario, dto.id_materia);
+  }
+
+  @Get('stats/enrollment')
+  async getEnrollmentStats() {
+    return this.inscripcionService.getEnrollmentStats();
+  }
 }

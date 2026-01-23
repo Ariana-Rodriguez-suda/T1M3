@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../../prisma/generated/carreras"
+  provider   = "prisma-client-js"
+  output     = "../../prisma/generated/carreras"
+  engineType = "binary"
 }
 
 datasource db {

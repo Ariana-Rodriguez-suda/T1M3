@@ -42,9 +42,36 @@ export class MateriaController {
     return this.materiaService.update(+id, dto);
   }
 
-
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.materiaService.remove(+id);
+  }
+
+  @Get('by-career/:id_carrera')
+  async getMateriasByCarrera(@Param('id_carrera', ParseIntPipe) idCarrera: number) {
+    return this.materiaService.findMateriasByCarrera(idCarrera);
+  }
+
+  @Get('by-career-period/:id_carrera/:id_periodo')
+  async getMateriasByCarreraAndPeriodo(
+    @Param('id_carrera', ParseIntPipe) idCarrera: number,
+    @Param('id_periodo', ParseIntPipe) idPeriodo: number,
+  ) {
+    return this.materiaService.findMateriasByCarreraAndPeriodo(idCarrera, idPeriodo);
+  }
+
+  @Get('available/list')
+  async getAvailableMaterias() {
+    return this.materiaService.findAvailableMaterias();
+  }
+
+  @Get('report/student-materia-count')
+  async getStudentMateriaReport() {
+    return this.materiaService.getStudentMateriaCountReport();
+  }
+
+  @Get('report/materia-count-by-career')
+  async getMateriaCountByCarrera() {
+    return this.materiaService.getMateriaCountByCarrera();
   }
 }

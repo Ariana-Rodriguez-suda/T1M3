@@ -24,9 +24,9 @@
     "prisma:migrate:usuarios": "prisma migrate dev --name init_usuarios --schema=prisma/usuarios/schema.prisma --config=prisma/usuarios/prisma.config.ts",
     "prisma:migrate:carreras": "prisma migrate dev --name init_carreras --schema=prisma/carreras/schema.prisma --config=prisma/carreras/prisma.config.ts",
     "prisma:migrate:profesor": "prisma migrate dev --name init_profesor --schema=prisma/profesor/schema.prisma --config=prisma/profesor/prisma.config.ts",
-    "prisma:seed:usuarios": "ts-node prisma/seed-usuarios.ts",
-    "prisma:seed:carreras": "ts-node prisma/seed-carreras.ts",
-    "prisma:seed:profesor": "ts-node prisma/seed-profesor.ts"
+    "prisma:seed:usuarios": "ts-node prisma/usuarios/seed-usuarios.ts",
+    "prisma:seed:carreras": "ts-node prisma/carreras/seed-carreras.ts",
+    "prisma:seed:profesor": "ts-node prisma/profesor/seed-profesor.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -36,6 +36,7 @@
     "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.2.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",

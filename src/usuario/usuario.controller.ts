@@ -47,4 +47,42 @@ export class UsuarioController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.usuarioService.remove(id);
   }
+
+  @Get('search/active-students')
+  async getActiveStudents() {
+    return this.usuarioService.findActiveStudentsWithCareer();
+  }
+
+  @Get('search/teachers-multiple-subjects')
+  async getTeachersWithMultipleSubjects() {
+    return this.usuarioService.findTeachersWithMultipleSubjects();
+  }
+
+  @Get('search/student-enrollments/:id_usuario/:id_periodo')
+  async getStudentEnrollments(
+    @Param('id_usuario', ParseIntPipe) idUsuario: number,
+    @Param('id_periodo', ParseIntPipe) idPeriodo: number,
+  ) {
+    return this.usuarioService.findStudentEnrollmentsByPeriod(idUsuario, idPeriodo);
+  }
+
+  @Get('search/active-students-career/:id_carrera')
+  async getActiveStudentsByCareer(
+    @Param('id_carrera', ParseIntPipe) idCarrera: number,
+  ) {
+    return this.usuarioService.findActiveStudentsByCareerAndPeriod(idCarrera);
+  }
+
+  @Get('search/active-teachers')
+  async getActiveTeachers() {
+    return this.usuarioService.findActiveTeachers();
+  }
+
+  @Get('search/students-by-career/:id_carrera')
+  async getStudentsByCareer(
+    @Param('id_carrera', ParseIntPipe) idCarrera: number,
+    @Query('role') role?: string,
+  ) {
+    return this.usuarioService.findStudentsByCareerAndRole(idCarrera, role);
+  }
 }

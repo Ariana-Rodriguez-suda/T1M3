@@ -65,4 +65,78 @@ export class MateriaService {
       where: { id_materia: id },
     });
   }
+
+  async findMateriasByCarrera(idCarrera: number) {
+    return this.prisma.materia.findMany({
+      where: {
+        id_carrera: idCarrera,
+      },
+      include: {
+        carrera: true,
+        aula: true,
+        periodo: true,
+      },
+    });
+  }
+
+  async findMateriasByCarreraAndPeriodo(idCarrera: number, idPeriodo: number) {
+    return this.prisma.materia.findMany({
+      where: {
+        AND: [
+          { id_carrera: idCarrera },
+          { periodoId: idPeriodo },
+        ],
+      },
+      include: {
+        carrera: true,
+        aula: true,
+        periodo: true,
+      },
+    });
+  }
+
+  async findAvailableMaterias() {
+    return this.prisma.materia.findMany({
+      include: {
+        carrera: true,
+        aula: true,
+        periodo: true,
+      },
+    });
+  }
+
+  async getStudentMateriaCountReport() {
+    return this.prisma.$queryRaw`
+      SELECT 
+        u.nombre,
+        u.apellido,
+        c.nombre_carrera as carrera,
+        COUNT(m.id_materia) as total_materias
+      FROM "Usuario" u
+      INNER JOIN "Inscripcion" i ON u.id_usuario = i.id_usuario
+      INNER JOIN (
+        SELECT DISTINCT id_carrera FROM "Materia"
+      ) c_distinct ON i.id_carrera = c_distinct.id_carrera
+      LEFT JOIN "Materia" m ON c_distinct.id_carrera = m.id_carrera
+      WHERE u.tipo = 'estudiante'
+      GROUP BY u.id_usuario, u.nombre, u.apellido, c.nombre_carrera
+      ORDER BY total_materias DESC
+    `;
+  }
+
+  /**
+   * Reporte alternativo más simple: Contar materias por carrera
+   */
+  async getMateriaCountByCarrera() {
+    return this.prisma.$queryRaw`
+      SELECT 
+        c.id_carrera,
+        c.nombre_carrera,
+        COUNT(m.id_materia) as total_materias,
+      LEFT JOIN "Materia" m ON c.id_carrera = m.id_carrera
+      LEFT JOIN "Aula" a ON m.id_aula = a.id_aula
+      GROUP BY c.id_carrera, c.nombre_carrera, a.nombre_aula, a.capacidad
+      ORDER BY total_materias DESC
+    `;
+  }
 }
