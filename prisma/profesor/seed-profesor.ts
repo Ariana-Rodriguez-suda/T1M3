@@ -10,27 +10,47 @@ const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
-  // Crear profesores SIN userId (relación lógica futura)
   await prisma.profesor.createMany({
-    data: [{}, {}, {}, {}],
+    data: [
+      { userId: 2 },
+      { userId: 3 },
+    ],
   })
 
   const profesores = await prisma.profesor.findMany()
 
-  // Crear títulos
   await prisma.titulo.createMany({
-    data: profesores.map((profesor, index) => ({
-      id_profesor: profesor.id_profesor,
-      nombre_titulo: [
-        'Ingeniero en Sistemas',
-        'Licenciado en Matemáticas',
-        'Magíster en Educación',
-        'Doctor en Ciencias',
-      ][index % 4],
-      institucion: 'Universidad Nacional',
-      ano_obtencion: 2015 + index,
-    })),
+    data: [
+      {
+        id_profesor: profesores[0].id_profesor,
+        nombre_titulo: 'Ingeniero en Sistemas',
+        institucion: 'Universidad Nacional',
+        ano_obtencion: 2015,
+      },
+      {
+        id_profesor: profesores[0].id_profesor,
+        nombre_titulo: 'Magíster en Software',
+        institucion: 'Universidad Técnica',
+        ano_obtencion: 2018,
+      },
+      {
+        id_profesor: profesores[1].id_profesor,
+        nombre_titulo: 'Licenciada en Matemáticas',
+        institucion: 'Universidad Central',
+        ano_obtencion: 2014,
+      },
+      {
+        id_profesor: profesores[1].id_profesor,
+        nombre_titulo: 'Doctora en Educación',
+        institucion: 'Universidad del Pacífico',
+        ano_obtencion: 2020,
+      },
+    ],
   })
+
+  console.log('✅ Seed profesor completado')
+  console.log(`   - 2 profesores creados con userId`)
+  console.log(`   - 4 títulos creados`)
 }
 
 main()

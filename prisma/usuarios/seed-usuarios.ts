@@ -50,7 +50,18 @@ async function main() {
     })
   }
 
-  // Usuarios
+  const estudianteRol = await prisma.rol.findFirst({
+    where: { nombre: 'ESTUDIANTE' },
+  })
+
+  const profesorRol = await prisma.rol.findFirst({
+    where: { nombre: 'PROFESOR' },
+  })
+
+  if (!estudianteRol || !profesorRol) {
+    throw new Error('Roles no encontrados')
+  }
+
   await prisma.usuario.createMany({
     data: [
       {
@@ -64,12 +75,21 @@ async function main() {
       },
       {
         nombre: 'Juan',
-        apellido: 'Caicedo',
+        apellido: 'Pérez',
         dni: '0966443377',
         correo: 'juan@uni.edu',
         clave: '123456',
         tipo: 'profesor',
-        rolId: adminRol.id_rol,
+        rolId: profesorRol.id_rol,
+      },
+      {
+        nombre: 'María',
+        apellido: 'García',
+        dni: '0955443377',
+        correo: 'maria@uni.edu',
+        clave: '123456',
+        tipo: 'profesor',
+        rolId: profesorRol.id_rol,
       },
       {
         nombre: 'Ana',
@@ -78,11 +98,58 @@ async function main() {
         correo: 'ana@uni.edu',
         clave: '123456',
         tipo: 'estudiante',
-        rolId: adminRol.id_rol,
+        rolId: estudianteRol.id_rol,
+      },
+      {
+        nombre: 'Carlos',
+        apellido: 'Mendoza',
+        dni: '0933554477',
+        correo: 'carlos@uni.edu',
+        clave: '123456',
+        tipo: 'estudiante',
+        rolId: estudianteRol.id_rol,
+      },
+      {
+        nombre: 'Laura',
+        apellido: 'Rojas',
+        dni: '0944665588',
+        correo: 'laura@uni.edu',
+        clave: '123456',
+        tipo: 'estudiante',
+        rolId: estudianteRol.id_rol,
       },
     ],
     skipDuplicates: true,
   })
+
+  const estudiantes = await prisma.usuario.findMany({
+    where: { tipo: 'estudiante' },
+  })
+
+  await prisma.inscripcion.createMany({
+    data: [
+      {
+        id_usuario: estudiantes[0].id_usuario,
+        id_carrera: 1,
+        fecha_inscripcion: new Date('2024-01-15'),
+      },
+      {
+        id_usuario: estudiantes[1].id_usuario,
+        id_carrera: 1,
+        fecha_inscripcion: new Date('2024-01-16'),
+      },
+      {
+        id_usuario: estudiantes[2].id_usuario,
+        id_carrera: 2,
+        fecha_inscripcion: new Date('2024-01-17'),
+      },
+    ],
+    skipDuplicates: true,
+  })
+
+  console.log('✅ Seed usuarios completado')
+  console.log(`   - 6 usuarios creados`)
+  console.log(`   - 3 inscripciones creadas`)
 }
 
 main()
