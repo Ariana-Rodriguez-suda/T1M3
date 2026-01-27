@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaCarrerasService } from 'src/prisma/prisma-carreras.service';
+import { PrismaUsuariosService } from 'src/prisma/prisma-usuarios.service';
 import { CreateMateriaDto } from './dto/create-materia.dto';
 import { UpdateMateriaDto } from './dto/update-materia.dto';
 
 @Injectable()
 export class MateriaService {
-  constructor(private prisma: PrismaCarrerasService) {}
+  constructor(
+    private prisma: PrismaCarrerasService,
+    private prismaUsuarios: PrismaUsuariosService,
+  ) {}
 
   findAll(skip = 0, take = 10) {
     return this.prisma.materia.findMany({
@@ -106,22 +110,21 @@ export class MateriaService {
   }
 
   async getStudentMateriaCountReport() {
-    return this.prisma.$queryRaw`
+    const result = await this.prisma.$queryRaw`
       SELECT 
-        u.nombre,
-        u.apellido,
-        c.nombre_carrera as carrera,
-        COUNT(m.id_materia) as total_materias
-      FROM "Usuario" u
-      INNER JOIN "Inscripcion" i ON u.id_usuario = i.id_usuario
-      INNER JOIN (
-        SELECT DISTINCT id_carrera FROM "Materia"
-      ) c_distinct ON i.id_carrera = c_distinct.id_carrera
-      LEFT JOIN "Materia" m ON c_distinct.id_carrera = m.id_carrera
-      WHERE u.tipo = 'estudiante'
-      GROUP BY u.id_usuario, u.nombre, u.apellido, c.nombre_carrera
+        c.id_carrera,
+        c.nombre_carrera,
+        COUNT(m.id_materia)::int as total_materias,
+        a.nombre_aula,
+        a.capacidad
+      FROM "Carrera" c
+      LEFT JOIN "Materia" m ON c.id_carrera = m.id_carrera
+      LEFT JOIN "Aula" a ON m.id_aula = a.id_aula
+      GROUP BY c.id_carrera, c.nombre_carrera, a.nombre_aula, a.capacidad
       ORDER BY total_materias DESC
     `;
+    
+    return result;
   }
 
   /**

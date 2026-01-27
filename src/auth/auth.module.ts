@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PrismaUsuariosService } from 'src/prisma/prisma-usuarios.service';
@@ -10,6 +11,7 @@ import { PrismaUsuariosService } from 'src/prisma/prisma-usuarios.service';
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
