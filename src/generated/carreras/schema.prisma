@@ -1,6 +1,6 @@
 generator client {
   provider   = "prisma-client-js"
-  output     = "../generated/carreras"
+  output     = "../../src/generated/carreras"
   engineType = "binary"
 }
 
